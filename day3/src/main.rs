@@ -10,8 +10,8 @@ struct Tile {
 
 #[derive(Debug, Clone, Copy)]
 struct Tile2 {
-    red: Option<usize>,
-    blue: Option<usize>,
+    red: usize,
+    blue: usize,
 }
 
 fn main() {
@@ -26,8 +26,8 @@ fn part2() {
     let mut board: Vec<Vec<Tile2>> = vec![
         vec![
             Tile2 {
-                red: None,
-                blue: None,
+                red: 0,
+                blue: 0,
             };
             VAL
         ];
@@ -63,8 +63,8 @@ fn part2() {
                         .expect("Invalid index")
                         .get_mut(red_pos.1)
                         .expect("Invalid index y");
-                    if tile.red == None {
-                        tile.red = Some(red_moves);
+                    if tile.red == 0 {
+                        tile.red = red_moves;
                     }
                 }
             }
@@ -78,8 +78,8 @@ fn part2() {
                         .expect("Invalid index")
                         .get_mut(red_pos.1)
                         .expect("Invalid index y");
-                    if tile.red == None {
-                        tile.red = Some(red_moves);
+                    if tile.red == 0 {
+                        tile.red = red_moves;
                     }
                 }
             }
@@ -92,8 +92,8 @@ fn part2() {
                         .expect("Invalid index")
                         .get_mut(red_pos.1)
                         .expect("Invalid index y");
-                    if tile.red == None {
-                        tile.red = Some(red_moves);
+                    if tile.red == 0 {
+                        tile.red = red_moves;
                     }
                 }
             }
@@ -106,8 +106,8 @@ fn part2() {
                         .expect("Invalid index")
                         .get_mut(red_pos.1)
                         .expect("Invalid index y");
-                    if tile.red == None {
-                        tile.red = Some(red_moves);
+                    if tile.red == 0 {
+                        tile.red = red_moves;
                     }
                 }
             }
@@ -125,8 +125,8 @@ fn part2() {
                     blue_mov += 1;
                     blue_pos.0 += 1;
                     let mut tile = board[blue_pos.0][blue_pos.1];
-                    if tile.blue == None {
-                        tile.blue = Some(blue_mov);
+                    if tile.blue == 0 {
+                        tile.blue = blue_mov;
                     }
                 }
             }
@@ -136,8 +136,8 @@ fn part2() {
                     blue_mov += 1;
                     blue_pos.0 -= 1;
                     let mut tile = board[blue_pos.0][blue_pos.1];
-                    if tile.blue == None {
-                        tile.blue = Some(blue_mov);
+                    if tile.blue == 0 {
+                        tile.blue = blue_mov;
                     }
                 }
             }
@@ -147,8 +147,8 @@ fn part2() {
                     blue_mov += 1;
                     blue_pos.1 += 1;
                     let mut tile = board[blue_pos.0][blue_pos.1];
-                    if tile.blue == None {
-                        tile.blue = Some(blue_mov);
+                    if tile.blue == 0 {
+                        tile.blue = blue_mov;
                     }
                 }
             }
@@ -158,8 +158,8 @@ fn part2() {
                     blue_mov += 1;
                     blue_pos.1 -= 1;
                     let mut tile = board[blue_pos.0][blue_pos.1];
-                    if tile.blue == None {
-                        tile.blue = Some(blue_mov);
+                    if tile.blue == 0 {
+                        tile.blue = blue_mov;
                     }
                 }
             }
@@ -173,7 +173,9 @@ fn part2() {
     for (x, line) in board.iter().enumerate() {
         for (y, tile) in line.iter().enumerate() {
             match (tile.red, tile.blue) {
-                (Some(i), Some(j)) => {
+                (0, _) => {},
+                (_, 0) => {},
+                (i, j) => {
                     let temp = i + j ;
                     if temp < steps {
                         steps = temp;
