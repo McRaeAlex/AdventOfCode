@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::usize;
+use std::collections::BTreeSet;
 
 #[derive(Debug, Clone, Copy)]
 struct Tile {
@@ -23,16 +24,9 @@ fn part2() {
     // We will set middle to 1000, 1000
 
     // Create the board
-    let mut board: Vec<Vec<Tile2>> = vec![
-        vec![
-            Tile2 {
-                red: 0,
-                blue: 0,
-            };
-            VAL
-        ];
-        VAL
-    ];
+    //let mut intersections: BTreeSet<(isize, isize, usize)> = BTreeSet::new();
+    let mut red_path: Vec<(usize, usize, usize)> = Vec::new();
+    let mut blue_path: Vec<(usize, usize, usize)> = Vec::new();
 
     // Read in file
     let mut file = File::open("input.txt").unwrap();
@@ -44,154 +38,113 @@ fn part2() {
     let red = lines.next().expect("failed to get red line");
     let blue = lines.next().expect("failed to get blue line");
 
-    let mut red_pos = (VAL / 2, VAL / 2);
+    println!("Going through red");
+
     let mut red_moves = 0;
-    let mut blue_pos = (VAL / 2, VAL / 2);
-    let mut blue_mov = 0;
+    let mut red_pos = (VAL / 2, VAL / 2);
 
     for command in red.split(",") {
-        //println!("pos: {:?}, command: {:?}", red_pos, command);
-
-        match command.chars().nth(0).expect("Failed to get first char") {
+        match command.chars().nth(0).expect("Failure") {
             'R' => {
                 let val = command[1..].parse::<usize>().expect("Failed to parse int");
                 for _ in 0..val {
                     red_moves += 1;
                     red_pos.0 += 1;
-                    let mut tile = board
-                        .get_mut(red_pos.0)
-                        .expect("Invalid index")
-                        .get_mut(red_pos.1)
-                        .expect("Invalid index y");
-                    if tile.red == 0 {
-                        tile.red = red_moves;
-                    }
+                    red_path.push((red_pos.0, red_pos.1, red_moves));
                 }
-            }
+            },
             'L' => {
-                let val = command[1..].parse::<usize>().expect("Failed to parse int");
+                let val = command[1..].parse::<usize>().expect("Failed to parse L ");
                 for _ in 0..val {
                     red_moves += 1;
                     red_pos.0 -= 1;
-                    let mut tile = board
-                        .get_mut(red_pos.0)
-                        .expect("Invalid index")
-                        .get_mut(red_pos.1)
-                        .expect("Invalid index y");
-                    if tile.red == 0 {
-                        tile.red = red_moves;
-                    }
+                    red_path.push((red_pos.0, red_pos.1, red_moves));
                 }
-            }
-            'U' => {
-                let val = command[1..].parse::<usize>().expect("Failed to parse int");
-                for _ in 0..val {
-                    red_pos.1 += 1;
-                    let mut tile = board
-                        .get_mut(red_pos.0)
-                        .expect("Invalid index")
-                        .get_mut(red_pos.1)
-                        .expect("Invalid index y");
-                    if tile.red == 0 {
-                        tile.red = red_moves;
-                    }
-                }
-            }
+            },
             'D' => {
-                let val = command[1..].parse::<usize>().expect("Failed to parse int");
+                let val = command[1..].parse::<usize>().expect("Failed to parse D");
                 for _ in 0..val {
+                    red_moves += 1;
                     red_pos.1 -= 1;
-                    let mut tile = board
-                        .get_mut(red_pos.0)
-                        .expect("Invalid index")
-                        .get_mut(red_pos.1)
-                        .expect("Invalid index y");
-                    if tile.red == 0 {
-                        tile.red = red_moves;
-                    }
+                    red_path.push((red_pos.0, red_pos.1, red_moves));
+                }
+            },
+            'U' => {
+                let val = command[1..].parse::<usize>().expect("Failed to parse U");
+                for _ in 0..val {
+                    red_moves += 1;
+                    red_pos.1 += 1;
+                    red_path.push((red_pos.0, red_pos.1, red_moves));
                 }
             }
-            _ => panic!("Not parsing correctly"),
+            _ => {},
         }
     }
+
+    println!("Going through blue now!");
+
+    let mut blue_moves = 0;
+    let mut blue_pos = (VAL / 2, VAL / 2);
 
     for command in blue.split(",") {
-        //println!("pos: {:?}, command: {:?}", blue_pos, command);
-
-        match command.chars().nth(0).expect("Failed to get first char") {
+        match command.chars().nth(0).expect("Failure") {
             'R' => {
-                let val = command[1..].parse::<usize>().expect("failed to parse int");
+                let val = command[1..].parse::<usize>().expect("Failed to parse");
                 for _ in 0..val {
-                    blue_mov += 1;
+                    blue_moves += 1;
                     blue_pos.0 += 1;
-                    let mut tile = board[blue_pos.0][blue_pos.1];
-                    if tile.blue == 0 {
-                        tile.blue = blue_mov;
-                    }
+                    blue_path.push((blue_pos.0, blue_pos.1, blue_moves));
                 }
-            }
+            },
             'L' => {
-                let val = command[1..].parse::<usize>().expect("failed to parse int");
+                let val = command[1..].parse::<usize>().expect("Failed to parse");
                 for _ in 0..val {
-                    blue_mov += 1;
+                    blue_moves += 1;
                     blue_pos.0 -= 1;
-                    let mut tile = board[blue_pos.0][blue_pos.1];
-                    if tile.blue == 0 {
-                        tile.blue = blue_mov;
-                    }
+                    blue_path.push((blue_pos.0, blue_pos.1, blue_moves));
                 }
-            }
-            'U' => {
-                let val = command[1..].parse::<usize>().expect("failed to parse int");
-                for _ in 0..val {
-                    blue_mov += 1;
-                    blue_pos.1 += 1;
-                    let mut tile = board[blue_pos.0][blue_pos.1];
-                    if tile.blue == 0 {
-                        tile.blue = blue_mov;
-                    }
-                }
-            }
+            },
             'D' => {
-                let val = command[1..].parse::<usize>().expect("failed to parse int");
+                let val = command[1..].parse::<usize>().expect("Failed to parse");
                 for _ in 0..val {
-                    blue_mov += 1;
+                    blue_moves += 1;
                     blue_pos.1 -= 1;
-                    let mut tile = board[blue_pos.0][blue_pos.1];
-                    if tile.blue == 0 {
-                        tile.blue = blue_mov;
-                    }
+                    blue_path.push((blue_pos.0, blue_pos.1, blue_moves));
+                }
+            },
+            'U' => {
+                let val = command[1..].parse::<usize>().expect("Failed to parse");
+                for _ in 0..val {
+                    blue_moves += 1;
+                    blue_pos.1 += 1;
+                    blue_path.push((blue_pos.0, blue_pos.1, blue_moves));
                 }
             }
-            _ => panic!("Not parsing correctly"),
+            _ => {},
         }
     }
 
-    let mut steps = 10000000;
-    let mut point = ((VAL / 2) as isize, (VAL / 2) as isize);
+    let mut steps = usize::max_value();
 
-    for (x, line) in board.iter().enumerate() {
-        for (y, tile) in line.iter().enumerate() {
-            match (tile.red, tile.blue) {
-                (0, _) => {},
-                (_, 0) => {},
-                (i, j) => {
-                    let temp = i + j ;
-                    if temp < steps {
-                        steps = temp;
-                        point = (x as isize - (VAL / 2) as isize, y as isize - (VAL / 2) as isize);
-                        println!("{:?}, {}", point, steps);
-                    }
-                },
-                _ => {},
+    //println!("{:?}", red_path);
+
+    for (x1, y1, rm) in &red_path {
+        //println!("{}, {}, {}", x1, y1, rm);
+        for (x2, y2, bm) in &blue_path {
+            //println!("Hello");
+            //println!("    {}, {}, {}", x2, y2, bm);
+            if *x1 == *x2 && *y1 == *y2 {
+                
+                let temp = rm + bm;
+                if temp < steps {
+                    steps = temp;
+                    println!("x: {} y: {} steps: {}", x1, y1, steps);
+                }
             }
         }
     }
 
-    println!(
-        "Lest steps point: {}, {}\nSteps: {}",
-        point.0, point.1, steps
-    );
+    println!("Answer: {}", steps);
 }
 
 fn part1() {
